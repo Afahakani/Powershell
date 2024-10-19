@@ -1,0 +1,101 @@
+Storage account name must be globally unique.
+Read Microsoft Managed Keys MMK and Customer Managed Keys (CMK)
+Create a General Purpose storage. It will contain container, file shares, queues and Tables. 
+Create a blob (say Image to contain your image files).
+Upload your image file to the blob
+
+Storage Tiers talks about frequency of access to the files in the blob
+Hot - Frequently accessed data
+Cool - Can store up to 30 days before accessing
+Cold - Can store up to 90 days before accessing
+Archive - up to 180 days before access
+
+File share filenames must be lowercase letters. Don't accept uppercase letters
+You go to browse after creating the file share and upload a file. You can connect or map the file to your computer drive
+You can even copy the powershell code to map the drive to your computer.
+
+What is a Shared Access Signature? A SAS is a URI that grants restricted access rights to Azure storage resources.
+You can grant a SAS to a client who you don't trust with your access key but need to grant him access to the resources for 
+a limited period of time.
+
+
+Storage Account Assignment
+Create a Storage Account
+Disable Public Network
+Show that you cannot access the storage.
+Create a private endpoint. Go to networking and show that the private endpoint is approved
+Create a VM on the subnet. Log into your VM and connect to your storage and 
+confirm that you can see your fileshare. Once you see your fileshare, take a screen shot.
+Open command prompt, type Ipconfig to show that the VM is in the Vnet with the fileshare
+Take a screenshot of your private endpoint NIC and DNS to match the IP Address
+
+
+
+
+
+Powershell Azure
+
+To connect to Azure using powershell
+
+connect-AzAccount
+
+To use winget to search for the latest version of powershell
+winget search Microsoft.PowerShell
+
+To install Azure module
+install-module -Name az -force (add -force if you want to force install)
+
+to import azure accounts
+import-module az.accounts
+
+To create resource group, virtual network and subnets
+
+1. Use New-AzVirtualNetwork to create a virtual network named vnet-1 
+with IP address prefix 10.0.0.0/16 in the test-rg resource group 
+and eastus2 location:
+
+$vnet = @{
+    Name = 'vnet-1'
+    ResourceGroupName = 'test-rg'
+    Location = 'eastus2'
+    AddressPrefix = '10.0.0.0/16'
+}
+$virtualNetwork = New-AzVirtualNetwork @vnet
+
+2. Azure deploys resources to a subnet within a virtual network. 
+Use Add-AzVirtualNetworkSubnetConfig to create a subnet configuration 
+named subnet-1 with address prefix 10.0.0.0/24:
+
+$subnet = @{
+    Name = 'subnet-1'
+    VirtualNetwork = $virtualNetwork
+    AddressPrefix = '10.0.0.0/24'
+}
+$subnetConfig = Add-AzVirtualNetworkSubnetConfig @subnet
+
+3. Associate the subnet configuration to the virtual network by using 
+Set-AzVirtualNetwork:
+$virtualNetwork | Set-AzVirtualNetwork
+
+
+NEW SUBNET
+4. To create a new subnet after closing the powershell and reopening,
+call the earlier created vnet
+
+ 
+$vnet = @{ 
+    Name = 'vnet-UserGroupGh' 
+    ResourceGroupName = 'UserGroupGH-rg' 
+}  
+$virtualNetwork = Get-AzVirtualNetwork @vnet 
+  
+ 
+ 
+$subnet = @{ 
+    Name = 'Gh-Subnet2' 
+    VirtualNetwork = $virtualNetwork 
+    AddressPrefix = '10.0.1.0/24' 
+} 
+$subnetConfig = Add-AzVirtualNetworkSubnetConfig @subnet 
+ 
+$virtualNetwork | Set-AzVirtualNetwork 
