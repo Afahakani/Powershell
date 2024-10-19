@@ -1,0 +1,66 @@
+Powershell Azure
+
+To connect to Azure using powershell
+
+connect-AzAccount
+
+To use winget to search for the latest version of powershell
+winget search Microsoft.PowerShell
+
+To install Azure module
+install-module -Name az -force (add -force if you want to force install)
+
+to import azure accounts
+import-module az.accounts
+
+To create resource group, virtual network and subnets
+
+1. Use New-AzVirtualNetwork to create a virtual network named vnet-1 
+with IP address prefix 10.0.0.0/16 in the test-rg resource group 
+and eastus2 location:
+
+$vnet = @{
+    Name = 'vnet-1'
+    ResourceGroupName = 'test-rg'
+    Location = 'eastus2'
+    AddressPrefix = '10.0.0.0/16'
+}
+$virtualNetwork = New-AzVirtualNetwork @vnet
+
+2. Azure deploys resources to a subnet within a virtual network. 
+Use Add-AzVirtualNetworkSubnetConfig to create a subnet configuration 
+named subnet-1 with address prefix 10.0.0.0/24:
+
+$subnet = @{
+    Name = 'subnet-1'
+    VirtualNetwork = $virtualNetwork
+    AddressPrefix = '10.0.0.0/24'
+}
+$subnetConfig = Add-AzVirtualNetworkSubnetConfig @subnet
+
+3. Associate the subnet configuration to the virtual network by using 
+Set-AzVirtualNetwork:
+$virtualNetwork | Set-AzVirtualNetwork
+
+
+NEW SUBNET
+4. To create a new subnet after closing the powershell and reopening,
+call the earlier created vnet
+
+ 
+$vnet = @{ 
+    Name = 'vnet-UserGroupGh' 
+    ResourceGroupName = 'UserGroupGH-rg' 
+}  
+$virtualNetwork = Get-AzVirtualNetwork @vnet 
+  
+ 
+ 
+$subnet = @{ 
+    Name = 'Gh-Subnet2' 
+    VirtualNetwork = $virtualNetwork 
+    AddressPrefix = '10.0.1.0/24' 
+} 
+$subnetConfig = Add-AzVirtualNetworkSubnetConfig @subnet 
+ 
+$virtualNetwork | Set-AzVirtualNetwork 
