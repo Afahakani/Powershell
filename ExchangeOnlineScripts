@@ -1,0 +1,54 @@
+Import-Module ExchangeOnlineManagement
+Connect-ExchangeOnline
+Get-Mailbox -ResultSize unlimited |FT
+Get-Mailbox -ResultSize unlimited |select Alias
+
+Get-Mailbox -Identity Myol_Room1 |fl
+
+Set-Mailbox -Identity Myol_Room1 -DisplayName "Myol Conference Centre" -EmailAddresses SMTP:Myol_Room01@M365x86193292.onmicrosoft.com
+
+Get-Mailbox -Identity Myol_Room1 |fl
+
+Get-Mailbox -ResultSize unlimited |select Alias
+
+$name = "Myol_Room01"
+$identity = "Myol_Room1"
+$displayname = "Myol Conference Room"
+
+Set-Mailbox -Name $Name -DisplayName $displayname
+
+Set-Mailbox -Identity $identity -Name $name -DisplayName $displayname
+
+Get-Mailbox -Identity $identity |fl
+
+Set-Mailbox -Identity Myol_Room1 -Name $name -DisplayName $displayname
+
+
+# List of users
+$users = Get-Mailbox -ResultSize unlimited 
+
+# Loop through each user and disable OWA
+foreach ($user in $users) {
+    Write-Host "Disabling OWA, POP and IMAP for $user"
+    Set-CasMailbox -Identity $user -OWAEnabled $true -PopEnabled $true -ImapEnabled $true
+}
+
+Set-CasMailbox -Identity MyolEntreprises -OWAEnabled $false -PopEnabled $false -ImapEnabled $true
+
+#Import the Distribution Group csv file
+
+$DistributionGroups = Import-Csv -Path "C:\Users\User\Documents\Microsoft Courses\Azure\M365\Myol DL.csv"
+
+foreach ($DistributionGroup in $DistributionGroups) {
+New-DistributionGroup -Name $DistributionGroup.Name -Alias $DistributionGroup.Alias -PrimarySmtpAddress $DistributionGroup.PrimarySmtpAddress
+}
+
+Get-TransportRule
+
+New-TransportRule -Name EmailDisclaimer1 -Priority 1 -SenderDomainIs "yahoo.com" -ExceptIfSubjectOrBodyContainsWords "you" -RejectMessageReasonText "This account does not receive emails from the domain yahoo.com"
+
+Disable-TransportRule -Identity EmailDisclaimer1
+
+Disable-TransportRule -Identity EmailDisclaimer
+
+Get-TransportRule
